@@ -4,7 +4,18 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 
-// mongoose.connect("mongodb://localhost:27017/users", { useUnifiedTopology: true, useNewUrlParser: true });
+// Database connection and schema creation -------------------------------------------------------------------
+mongoose.connect("mongodb://localhost:27017/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+
+const userSchema = new mongoose.Schema ({
+    username: String,
+    email: String,
+    password: String,
+    property: String
+});
+
+const User = mongoose.model("User", userSchema);
+// -----------------------------------------------------------------------------------------------------------
 
 const app = express();
 app.set('view engine', 'ejs')
@@ -18,7 +29,21 @@ app.route("/")
         res.render("index");
     })
     .post((req,res) => {
-        res.redirect("/dashboard");
+        req.body.password = crypto.createHash('sha256').update(req.body.password).digest('hex');
+        
+        User.find({username:req.body.username, password:req.body.password}, (err,data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(data);
+                if (data.length === 0) {
+                    console.log('no user found');
+                    res.redirect("/");
+                } else {
+                    res.redirect("/dashboard");
+                }     
+            }
+        });
     });
 
 // Register route -------------
@@ -28,7 +53,16 @@ app.route("/register")
     })
     .post((req,res) => {
         req.body.password = crypto.createHash('sha256').update(req.body.password).digest('hex');
-        console.log(req.body);
+
+        const user = new User ({
+            username: req.body.username,
+            email: req.body.email,
+            password: req.body.password,
+            property: req.body.property
+        });
+
+        user.save();
+
         res.redirect("/")
     });
 
