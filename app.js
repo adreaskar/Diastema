@@ -5,8 +5,8 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 
 // Database connection and schema creation -------------------------------------------------------------------
-// mongoose.connect("mongodb://10.20.20.98/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
-mongoose.connect("mongodb://localhost:27017/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect("mongodb://10.20.20.98/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+// mongoose.connect("mongodb://localhost:27017/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema ({
     username: String,
