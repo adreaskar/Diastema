@@ -6,6 +6,7 @@ const crypto = require("crypto");
 
 // Database connection and schema creation -------------------------------------------------------------------
 mongoose.connect("mongodb://10.20.20.98/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+// mongoose.connect("mongodb://localhost:27017/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema ({
     username: String,
@@ -35,12 +36,11 @@ app.route("/")
             if (err) {
                 console.log(err);
             } else {
-                console.log(data);
                 if (data.length === 0) {
                     console.log('no user found');
                     res.redirect("/");
                 } else {
-                    res.redirect("/dashboard");
+                    res.redirect("/modelling?us=" + req.body.username);
                 }     
             }
         });
@@ -67,20 +67,21 @@ app.route("/register")
     });
 
 // Modelling route --------------
-app.route("/dashboard")
+app.route("/modelling")
     .get((req,res) => {
-        res.render("dashboard");
+        const username = req.query.us;
+        res.render("dashboard", {user:username});
     });
 
 // Toolkit route -------------
 app.route("/toolkit")
     .post((req,res) => {
         console.log(req.body);
-        res.redirect("/dashboard")
+        res.redirect("/modelling")
     });
 
 // Visualization route ---
-app.route("/dashboard")
+app.route("/vizualize")
     .get((res,req) => {
 
     })
