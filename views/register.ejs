@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link style="width: 16px;" rel="shortcut icon" type="image/png" href="img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diastema | Home</title>
+
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.css" rel="stylesheet"/>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+</head>
+<body style="background: rgba(0, 0, 0, 0.048) !important;">
+
+    <nav class=" navbar-expand-lg navbar-light bg-light" style="padding: 20px 0 20px 0;box-shadow: none;">
+        <div class="container-fluid" id="menu-login">
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <img src="img/logo.png" style="width: 200px;">
+            </div>
+        </div>
+    </nav>
+    
+    <div id="head">
+
+        <h2 style="margin:100px auto auto auto">Register</h2>
+
+        <form style="width:60%;margin:50px auto 100px auto;" id="form" method="POST" action="/register">
+            <!-- Username input -->
+            <div class="form-floating mb-3">
+                <input type="text" name="username" class="form-control" id="floatingInput" required>
+                <label for="floatingInput">Username</label>
+            </div>
+            <!-- Email input -->
+            <div class="form-floating mb-3">
+                <input type="email" name="email" class="form-control" id="floatingInput" required>
+                <label for="floatingInput">Email address</label>
+            </div>
+            <!-- Password input -->
+            <div class="form-floating">
+                <input type="password" name="password" class="form-control" id="floatingPassword" required>
+                <label for="floatingPassword">Password</label>
+            </div>
+            <br>
+
+            <label for="property">Register as:</label><br>
+            <select name="property" id="property" style="border-color: #d1d1d1;border-radius: 4px;padding: 5px;" required>
+                <option selected="true" disabled="disabled" value="">Please choose a property</option>
+                <option value="analyst">Business Analyst</option>
+                <option value="scientist">Data Scientist</option>
+            </select>
+
+            <select name="organization" id="organization" style="border-color: #d1d1d1;border-radius: 4px;padding: 5px;margin-top: 8px;" required>
+                <option selected="true" disabled="disabled" value="">Please choose an organization</option>
+                <option value="Unipi">Unipi</option>
+                <option value="Metis">Metis</option>
+                <option value="BioAssist">BioAssist</option>
+            </select>
+            <br><br>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4" style="font-size:15px;margin: auto;" id="submit">Register</button>
+        </form>
+    </div>
+    
+    <div style="position: absolute;bottom: 20px;width: 100%;text-align: center;">
+        <footer>
+            <span style="font-size: 14px;">Diastema © 2021 - All rights reserved</span>
+        </footer>
+    </div>
+    
+</body>
+</html>
