@@ -6,37 +6,35 @@ var $deletebutton = $("#delete_node");
 $operatorProperties.hide();
 $deletebutton.hide();
 
+// Send notification when receiving message from orchestrator //
+const socket = io.connect();
+
+toastr.options = {
+	"closeButton": true,
+	"debug": false,
+	"newestOnTop": true,
+	"progressBar": true,
+	"positionClass": "toast-bottom-right",
+	"preventDuplicates": false,
+	"showDuration": "300",
+	"hideDuration": "1000",
+	"timeOut": "3000",
+	"extendedTimeOut": "1500",
+	"showEasing": "swing",
+	"hideEasing": "linear",
+	"showMethod": "fadeIn",
+	"hideMethod": "fadeOut"
+}
+	
+socket.on('new-notification', (message) => {
+	toastr.info(message, "Notification:");
+})
+// --------------------------------------------------------- //
 
 
 $(document).ready(function() {
 
-	// Send notification when receiving message from orchestrator //
-	const socket = io.connect();
-
-	toastr.options = {
-		"closeButton": true,
-		"debug": false,
-		"newestOnTop": true,
-		"progressBar": true,
-		"positionClass": "toast-bottom-right",
-		"preventDuplicates": false,
-		"showDuration": "300",
-		"hideDuration": "1000",
-		"timeOut": "3000",
-		"extendedTimeOut": "1000",
-		"showEasing": "swing",
-		"hideEasing": "linear",
-		"showMethod": "fadeIn",
-		"hideMethod": "fadeOut"
-	}
-        
-	socket.on('new-notification', (message) => {
-		toastr.info(message, "Orchestrator says:");
-	})
-	// ------------------------------------------ //
-
 	var canvas = $(".canvas");
-	var tools = $("#sidebar");
 
 	$(".draggable_operator").draggable({
 		helper: "clone",
@@ -92,7 +90,7 @@ $(document).ready(function() {
 					html = regression1 + '<option selected="true" disabled="disabled" value="default">'+node.property+'</option>' + regression2 + '<input type="text" name="field" class="form-control column" style="margin:auto auto 15px auto;width:80%;height:70%" onclick="editColumn(this)" value="'+node.field+'"></input>' +  + regression3;
 					break;
 				case "Cleaning":
-					html = cleaning1 + '<input type="number" step="0.01" name="field" class="form-control column" style="margin:auto auto 15px auto;width:80%;height:70%" onclick="editColumn(this)" value="'+node.field+'"></input>' +  + cleaning2;
+					html = cleaning1 + '<input type="number" step="0.01" min="0" max="1" name="field" class="form-control column" style="margin:auto auto 15px auto;width:80%;height:70%" onclick="editColumn(this)" value="'+node.field+'"></input>' +  + cleaning2;
 					break;
 				default:
 					break;
@@ -166,18 +164,18 @@ $(document).ready(function() {
 
 			// Job template
 			let job = {
+				"title":data.nodes[m].type.replace(/\s+/g, '-').toLowerCase(),
 				"id":data.nodes[m]._id,
 				"step":parseInt(m)+1,
 				"from":'',
 				"next":[],
-				"title":data.nodes[m].type.replace(/\s+/g, '-').toLowerCase(),
 				"save":false
 			};
 
 			// Calculate the next / from properties of every node
 			// by looping through all existing connections and 
 			// comparing node id's.
-			if (job.step === 1) job.from = 0;
+			if (job.step === 1 || data.nodes[m].type === "Data Load") job.from = 0;
 			let countNotLast = 0
 			for (n in data.connections) {
 				if (data.connections[n].to === job.id) {
@@ -200,12 +198,17 @@ $(document).ready(function() {
 			// Properties specific to the Classification and Regression jobs
 			if (data.nodes[m].type === "Classification" || data.nodes[m].type === "Regression") {
 				job.algorithm = data.nodes[m].property.toLowerCase();
+				if (job.algorithm === "select algorithm") job.algorithm = false;
 				job.column = data.nodes[m].field;
 			}
 
 			// Properties specific to the Cleaning job
 			if (data.nodes[m].type == "Cleaning") {
-				job["max-shrink"] = parseFloat(data.nodes[m].field);
+				if (data.nodes[m].field === "") {
+					job["max-shrink"] = false;
+				} else {
+					job["max-shrink"] = parseFloat(data.nodes[m].field);
+				}
 			}
 
 			data.jobs.push(job);
@@ -285,21 +288,29 @@ $(document).ready(function() {
 
 	// Send data
 	$('#send_data').click(()=>{
-		generateData();
-		$.ajax({
-			type: 'POST',
-			data: data,
-			success: function() {},
-			error: function(jqXHR, textStatus, err){ alert('text status: '+textStatus+', error: '+err) },
-			url: 'http://localhost:3000/toolkit',
-			cache:false
-		});
+		if (validateFields()) {
+			generateData();
+			$.ajax({
+				type: 'POST',
+				data: data,
+				success: function() {},
+				error: function(jqXHR, textStatus, err){ alert('text status: '+textStatus+', error: '+err) },
+				url: 'http://localhost:3000/toolkit',
+				cache:false
+			});
+		} else {
+			toastr.error("Please fill all the fields requied.", "Notification:");
+		}
 	});
 
 	// Download data
 	$('#set_data').click(()=>{
-		generateData();
-		download(JSON.stringify(data, null, 2), "data.json", "text/plain");
+		if (validateFields()) {
+			generateData();
+			download(JSON.stringify(data, null, 2), "data.json", "text/plain");
+		} else {
+			toastr.error("Please fill all the fields requied.", "Notification:");
+		}
 	});
 });
 
@@ -472,6 +483,14 @@ function editColumn(element) {
 		for (s in diagram) {
 			if (diagram[s]._id == elemid) {
 				diagram[s].field = $(this).val();
+				// Cleaning service max shrink validation check ---------------------------- //
+				if (diagram[s].property === "Cleaning") {
+					if ($(this).val() < 0 || $(this).val()> 1) {
+						toastr.error("Please enter a value between 0 and 1.", "Notification:");
+						$(this).val("")
+					}
+				}
+				// ------------------------------------------------------------------------ //
 			}
 		}
 	});
@@ -541,6 +560,18 @@ function minimize() {
 	$("#delete_node").html((i, text)=>{
 		return text === "Delete selected" ? "<i class='fas fa-trash-alt' style='font-size:15px'margin-left:-10px></i>" : "Delete selected";
 	});
+}
+
+function validateFields() {
+	let outcome = true;
+	for (m in diagram) {
+		if (diagram[m].type === "Classification" || diagram[m].type === "Regression") {
+			if (diagram[m].field === "") {
+				outcome = false;
+			};
+		}
+	}
+	return outcome;
 }
 
 // Click anywhere to hide node delete btn

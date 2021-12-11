@@ -15,7 +15,7 @@ var dataload =
                     '</div>' +
                 '</div>' +
             '</div>' +
-        '</div>' +
+        '</div>'
     '</div>' +
 '</div>';
 
