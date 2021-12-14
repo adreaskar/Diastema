@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link style="width: 16px;" rel="shortcut icon" type="image/png" href="img/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diastema | Home</title>
+    <title>Diastema | Upload</title>
 
     <link rel="stylesheet" href="css/jquery-ui.css">
     <link rel="stylesheet" href="css/style.css">
@@ -38,43 +38,18 @@
     
     <div id="head">
 
-        <h2 style="margin:100px auto auto auto">Welcome back</h2>
+        <h2 style="margin:100px auto auto auto">Upload your files</h2>
 
-        <!-- Alerts -->
-        <div id="failedlog" class="alert alert-danger" role="alert" style="width:60%;margin:10px auto -30px auto;">
-            
-        </div>
-
-        <script>
-            $("#failedlog").hide();
-        </script>
-
-        <form style="width:60%;margin:50px auto 100px auto;" id="form" method="POST" action="/">
+        <form style="width:60%;margin:50px auto 100px auto;" id="form" method="POST" action="/upload" enctype=multipart/form-data>
             <!-- Username input -->
-            <div class="form-floating mb-3">
-                <input type="text" name="username" class="form-control" id="floatingInput" required>
-                <label for="floatingInput">Username</label>
-            </div>
-            <!-- Password input -->
-            <div class="form-floating">
-                <input type="password" name="password" class="form-control" id="floatingPassword" >
-                <label for="floatingPassword">Password</label>
-            </div>
-
-            <!-- <label for="property">Log in as:</label>
-            <select name="property" id="property" style="border-color: #d1d1d1;border-radius: 4px;padding: 5px;">
-                <option selected="true" disabled="disabled" value="default">Please choose a property</option>
-                <option value="analyst">Business Analyst</option>
-                <option value="scientist">Data Scientist</option>
-            </select> -->
+            <input type="file" name="inpFile" multiple>
+            
             <br><br>
+            <input type="hidden" name="user" value="<%= user %>">
+            <input type="hidden" name="organization" value="<%= organization %>">
 
             <!-- Submit button -->
-            <button type="submit" class="btn btn-primary btn-block mb-4" style="font-size:15px;margin: auto;" id="submit">Sign in</button>
-
-            <div class="text-center">
-                <p>Not registered? <a href="/register" style="color:var(--main);text-decoration:none;">Register here</a></p>
-            </div>
+            <button type="submit" class="btn btn-primary btn-block mb-4" style="font-size:15px;margin: auto;" id="submit">Upload</button>
         </form>
     </div>
     

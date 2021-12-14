@@ -44,7 +44,7 @@
 
                 <!-- Logo -->
                 <div id="brand" class="d-flex flex-column flex-grow-1 brand-content px-2">
-                <a id="navbar-brand" class="navbar-brand d-flex align-items-center p-0 m-0" href="/dashboard" style="width:150px">
+                <a id="navbar-brand" class="navbar-brand d-flex align-items-center p-0 m-0" href="/" style="width:150px">
                     <img src="img/logo.png" class="navbar-image py-2" alt="" loading="lazy">
                 </a>
                 </div>
@@ -161,6 +161,16 @@
                                     </div>
                                 </li>
                             </ul>
+                        </div>
+
+                        <!-- Visualization Dashboard -->
+                        <div class="d-flex flex-column flex-shrink-0 position-relative">
+                            <a href="/visualize?us=<%= user %>&org=<%= org %>&id=<%= id %>" id="diagrambtn" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
+                                <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
+                                    <span class="material-icons" style="color: #3a91b3;width: 24px;"> bar_chart </span>
+                                </span>
+                                <span class="flex-grow-1 expanded-only" style="font-size: large;">Visualization Dashboard</span>
+                            </a>
                         </div>
                         
                         <button id="delete_node" type="button" class="delete_selected_button btn btn-primary" style="width: 80%;margin: 20px auto 5px auto;" onclick="deleteNode()">Delete selected</button>

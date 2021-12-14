@@ -26,8 +26,15 @@ toastr.options = {
 	"hideMethod": "fadeOut"
 }
 	
-socket.on('new-notification', (message) => {
-	toastr.info(message, "Notification:");
+socket.on('Modeller', (update) => {
+	
+	// if (update == "Data ready to visualize") {
+	// 	toastr.options.onclick = function() {
+	// 		var url = window.location.origin;
+	// 		window.location.replace(url + "/visualize");
+	// 	}
+	// }
+	toastr.info(update, "Notification:");
 })
 // --------------------------------------------------------- //
 
