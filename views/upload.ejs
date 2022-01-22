@@ -5,20 +5,16 @@
     <link style="width: 16px;" rel="shortcut icon" type="image/png" href="img/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diastema | Upload</title>
-
-    <link rel="stylesheet" href="css/jquery-ui.css">
+    
     <link rel="stylesheet" href="css/style.css">
+    <!-- jQuery -->
+    <link rel="stylesheet" href="css/jquery-ui.css">
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <!-- MDB -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.css" rel="stylesheet"/>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.0.0/mdb.min.js"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet"
+/>
 </head>
 <body style="background: rgba(0, 0, 0, 0.048) !important;">
 
@@ -40,11 +36,37 @@
 
         <h2 style="margin:100px auto auto auto">Upload your files</h2>
 
-        <form style="width:60%;margin:50px auto 100px auto;" id="form" method="POST" action="/upload" enctype=multipart/form-data>
-            <!-- Username input -->
-            <input type="file" name="inpFile" multiple>
+        <form style="width:80%;margin:50px auto 100px auto;" id="form" method="POST" action="/upload" enctype=multipart/form-data>
+            <!-- File input -->
+            <div class="form-outline mb-4">
+                <!-- <input type="file" name="inpFile" multiple> -->
+                <input type="file" class="form-control" name="inpFile" multiple required>
+                
+            </div>
+
+            <div class="row mb-4">
+                <!-- Source input -->
+                <div class="col">
+                  <div class="form-outline">
+                    <input type="text" class="form-control" name="source" / >
+                    <label class="form-label" for="typeText">Dataset source</label>
+                  </div>
+                </div>
+                <!-- Usecase input -->
+                <div class="col">
+                  <div class="form-outline">
+                    <input type="text" class="form-control" name="usecase" / >
+                    <label class="form-label" for="typeText">Dataset usecase</label>
+                  </div>
+                </div>
+            </div>
             
-            <br><br>
+            <div class="form-outline mb-4">
+                <input type="text" class="form-control" name="label" / >
+                <label class="form-label" for="typeText">Analysis label</label>
+            </div>
+            
+            <br>
             <input type="hidden" name="user" value="<%= user %>">
             <input type="hidden" name="organization" value="<%= organization %>">
 
@@ -59,6 +81,14 @@
         </footer>
     </div>
     
-    
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+
 </body>
 </html>

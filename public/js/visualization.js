@@ -1,3 +1,17 @@
+//------------------------Demo Purpose-----------------------------
+// $(window).on('load', function() {
+//     var formData = new FormData();
+//     formData.append("message", "visualize");
+//     formData.append("path", "metis/analysis-2/classified-3");
+//     formData.append("job", "classification");
+//     formData.append("column", "quality");
+
+//     var request = new XMLHttpRequest();
+//     request.open("POST", "http://localhost:3000/messages");
+//     request.send(formData);
+// });
+//-----------------------------------------------------------------
+
 $(document).ready(function() {
 
     const socket = io.connect();
@@ -27,6 +41,8 @@ $(document).ready(function() {
 
         $('#dataset').text(data.file);
         $('#org').text(data.org.charAt(0).toUpperCase() + data.org.slice(1));
+
+        $('#metadata').text( '<%= user %>' );
 
         // Load the file from its destination --
         d3.csv(file).then((loadedData) => {
@@ -121,6 +137,18 @@ $(document).ready(function() {
             let chart2 = new Chart(ctx2,options2);
         });
     })
+});
+
+// Go to dashboard button
+$('#dashb').click(()=> {
+    let url = window.location.origin;
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const user = urlParams.get('us');
+    const org = urlParams.get('org');
+    const id = urlParams.get('id');
+    let dash = url + "/dashboard?us=" + user + "&org=" + org + "&id=" + id;
+    window.location.replace(dash);
 });
 
 function downloadPDF() {

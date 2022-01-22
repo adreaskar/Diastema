@@ -202,11 +202,11 @@
 
                     <!-- Sidebar bottom section -->
                     <div class="d-flex flex-shrink-0 collapsible-section py-2">
-                        <a href="#" class="d-flex flex-row flex-grow-1 align-items-center overflow-hidden position-relative txt-dark sidebar-item">
+                        <a id="dashb" href="#" class="d-flex flex-row flex-grow-1 align-items-center overflow-hidden position-relative txt-dark sidebar-item">
                             <span>
                                 <span class="material-icons" style="font-size: 34px;margin: 7.5px 9px 0 10px;"> menu_open </span>
                             </span>
-                            <span class="expanded-only">Back to menu</span>
+                            <span class="expanded-only">Dashboard</span>
                         </a>
                         <div id="sidebarCollapse" class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon py-2" onclick="minimize()">
                             <i class="zmdi zmdi-chevron-left zmdi-hc-2x"></i>
@@ -228,6 +228,7 @@
                         <div style="position:absolute;display: flex;right: 30px;top: -5px;">
                             <div class="inline">
                                 <button type="button" class="set_data btn btn-primary" onclick="downloadPDF()">Export data</button>
+                                <button type="button" class="set_data btn btn-primary" onclick="show()">Show</button>
                             </div>
                         </div>
                     </div>
@@ -262,7 +263,7 @@
                                 <div class="card">
                                     <h5 class="card-header">Metrics</h5>
                                     <div class="card-body">
-                                        
+                                        <p class="card-title" id="metadata"></p>
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +297,7 @@
                 </div>
 
                 <footer style="text-align:center;margin-bottom: 13px;">
-                    <span style="font-size: 14px;">Diastema © 2021 - All rights reserved</span>
+                    <span style="font-size: 14px;">Diastema © 2021</span>
                 </footer>
             </div>
         </div>
@@ -376,16 +377,16 @@
 
         // Adds styling for main container
         function addInlineStyling() {
-        mainContainer.css('position', 'absolute');
-        mainContainer.css('bottom', 0);
-        mainContainer.css('right', 0);
-        mainContainer.css('top', '48px');
-        if (sidebarContainer.css('margin-left') == '0px') {
-            mainContainer.css('left', '48px');
-        }
-        else {
-            mainContainer.css('left', '0px');
-        }
+            mainContainer.css('position', 'absolute');
+            mainContainer.css('bottom', 0);
+            mainContainer.css('right', 0);
+            mainContainer.css('top', '48px');
+            if (sidebarContainer.css('margin-left') == '0px') {
+                mainContainer.css('left', '48px');
+            }
+            else {
+                mainContainer.css('left', '0px');
+            }
 
         }
 
@@ -398,6 +399,7 @@
         function addClass(item) {
             item.classList.toggle("active");
         }
+
     </script>
 
 </body>

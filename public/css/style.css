@@ -195,12 +195,6 @@ body {
 
 /* MAIN */
 
-/* .main-content {
-  overflow-x: hidden;
-  overflow-y: auto;
-  transition: all var(--transition-duration);
-} */
-
 /* CARDS */
 
 .mat-card {
@@ -350,6 +344,40 @@ h3, .material-icons {
 }
 .canvas .card:hover {
   cursor:move;
+}
+
+#dashbmain .col-12 {
+  cursor:pointer;
+  transition: transform 0.3s ease;
+}
+
+#dashbmain .col-12:hover {
+  transform: translateY(-8px);
+  transition: transform 0.3s ease;
+}
+
+#dashbmain .dashload {
+  background-color: #a53434;
+  color: white;
+  padding: 3px;
+  border-radius: 5%;
+  font-size: 17px !important;
+}
+
+#dashbmain .dashvis {
+  background-color: #5f8b4d;
+  color: white;
+  padding: 3px;
+  border-radius: 5%;
+  font-size: 17px !important;
+}
+
+#dashbmain .dashtool {
+  background-color: #eeb63e;
+  color: white;
+  padding: 3px;
+  border-radius: 5%;
+  font-size: 17px !important;
 }
 
 #tool {

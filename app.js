@@ -7,11 +7,12 @@ const socket = require('socket.io');
 const fs = require('fs');
 const Minio = require('minio')
 const upload = require('express-fileupload');
-var Multer = require("multer");
+const { path } = require("express/lib/application");
 
 // Database connections ------------------------------------------------------------------------------------
-//mongoose.connect("mongodb://10.20.20.98/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
-mongoose.connect("mongodb://localhost:27017/diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+const baseUrl = "mongodb://localhost:27017/";
+//const baseUrl = "mongodb://10.20.20.98/";
+mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema ({
     username: String,
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema ({
     organization: String
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.main.model("User", userSchema);
 
 
 var minioClient = new Minio.Client({
@@ -56,8 +57,7 @@ app.route("/")
                     console.log('no user found');
                     res.redirect("/");
                 } else {
-                    //res.redirect("/upload?us=" + req.body.username + "&org=" + data[0].toObject().organization);
-                    res.redirect("/modelling?us=" + req.body.username + "&org=" + data[0].toObject().organization + "&id=" + Math.random().toString(16).slice(2));
+                    res.redirect("/upload?us=" + req.body.username + "&org=" + data[0].toObject().organization);
                 }
             }
         });
@@ -92,55 +92,141 @@ app.route("/upload")
         res.render("upload", {user: username, organization:org});
     })
     .post((req,res) => {
-        //console.log(req.body);
         const org = (req.body.organization).toLowerCase();
+        const usecase = req.body.usecase;
+        const source = req.body.source;
+        const label = req.body.label;
+        const id = Math.random().toString(16).slice(2);
 
-        // for (m in req.files.inpFile) {
+        const uploadpath = 'public/data/';
 
-            // minioClient.bucketExists(org, function(err, exists) {
-            //     if (err) {
-            //       return console.log(err)
-            //     }
-            //     if (exists) {
-            //         minioClient.fPutObject(org, "analysis-2/raw/"+req.files.inpFile.name, req.files.inpFile.data, function(error, etag) {
-            //             if(error) {
-            //                 return console.log(error);
-            //             }
-            //             console.log(req.files.inpFile.name + "uploaded");
-            //         });
-            //     } else {
-            //         minioClient.makeBucket(org, function(err) {
-            //             if (err) return console.log(err);
-            //             minioClient.fPutObject(org, "analysis-2/raw/"+req.files.inpFile.name, req.files.inpFile.data, function(error, etag) {
-            //                 if(error) {
-            //                     return console.log(error);
-            //                 }
-            //                 console.log(req.files.inpFile.name + " uploaded");
-            //             });
-            //         });
-            //     }
-            // });
-        // }
-        res.redirect("/modelling?us=" + req.body.user + "&org=" + req.body.organization + "&id=" + Math.random().toString(16).slice(2));
+        // Save file to local storage
+        req.files.inpFile.mv(uploadpath + req.files.inpFile.name, function(error){
+            if (error) {
+                console.log("Error could not copy to local storage");
+                console.log(error);
+            }
+        });
+
+        // Check if bucket exists
+        minioClient.bucketExists(org, function(err, exists) {
+
+            if (err) {
+                return console.log(err)
+            }
+            // If exists, put the file in the bucket to the specified path and then delete it from local storage
+            if (exists) {
+                minioClient.fPutObject(org, "analysis-"+ id +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
+                    if(error) {
+                        return console.log(error);
+                    }
+                    console.log("Organization bucket exists");
+                    console.log(req.files.inpFile.name + " has been uploaded to minIO bucket");
+                    // Deletes the local file
+                    fs.unlinkSync(uploadpath+req.files.inpFile.name);
+                });
+            // If it doesnt exist, create bucket and then the rest
+            } else {
+                minioClient.makeBucket(org, function(err) {
+                    if (err) return console.log(err);
+                    minioClient.fPutObject(org, "analysis-"+ id +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
+                        if(error) {
+                            return console.log(error);
+                        }
+                        console.log("Organization bucket has been created");
+                        console.log(req.files.inpFile.name + " has been uploaded to minIO bucket");
+                        // Deletes the local file
+                        fs.unlinkSync(uploadpath+req.files.inpFile.name);   
+                    });
+                });
+            }
+        });
+
+        res.redirect("/modelling?us=" + req.body.user + "&org=" + req.body.organization + "&id=" + id + "&usecase=" + usecase + "&source=" + source + "&label=" + label + "&dataset=" + req.files.inpFile.name);
     });
 
-// Modelling route --------------
+// Modelling route -----------------------------------------------------
 app.route("/modelling")
     .get((req,res) => {
         const username = req.query.us;
         const organization = req.query.org;
         const id = req.query.id;
         res.render("modelling", {user:username,org:organization,id:id});
-    })
+    });
 
-// Toolkit route -------------
+// Dashboard route -----------------------------------------------------
+app.route("/dashboard")
+    .get((req,res)=> {
+        const username = req.query.us;
+        const organization = req.query.org;
+        const id = req.query.id;
+        let data = [];
+
+        // Search for collections in organization database
+        mongoose.dash = mongoose.createConnection(baseUrl + organization.toLowerCase(), { useUnifiedTopology: true, useNewUrlParser: true });
+        mongoose.dash.on('open', function (ref) {
+            
+            //Get all collection names
+            mongoose.dash.db.listCollections().toArray((error, collections) => {
+
+                // Database has collections
+                if (collections.length != 0) {
+                    let query = "yes";
+
+                    // For each collection, gather the information needed
+                    collections.forEach(async (collection,i) => {
+                        let coll = mongoose.dash.db.collection(collection.name);
+
+                        // Information schema
+                        let info = {
+                            id:collection.name, 
+                            jobs:[]
+                        }
+
+                        // Get all records in this collection
+                        let records = await coll.find().toArray();
+
+                        // For every record, gather information needed
+                        records.forEach(record => {
+                            if(record["job-json"]) {
+                                info["jobs"].push(record["job-json"]["title"]);
+                            }
+                            if (record["kind"]) {
+                                info.label = record.metadata["analysis-label"];
+                                info.usecase = record.metadata.usecase;
+                                info.source = record.metadata.source;
+                                info.dataset = record.metadata.dataset;
+                                info.user = record.metadata.user;
+                                info.date = record.metadata["analysis-date"];
+                                info.time = record.metadata["analysis-time"];
+                            }
+                        });
+
+                        data.push(info);
+
+                        // If it is the last collection, render the page
+                        if (i === collections.length - 1 ) {
+                            res.render("dashboard", {user:username,org:organization,id:id,query:query,data:data});
+                        }
+                    });
+                // Database is empty
+                } else {
+                    let query = "no";
+                    res.render("dashboard", {user:username,org:organization,id:id,query:query});
+                }
+
+            });
+        });
+    });
+
+// Toolkit route ------------------
 app.route("/toolkit")
     .post((req,res) => {
         console.log(req.body);
         res.redirect("/modelling");
     });
 
-// Visualization route ---
+// Visualization route -----------------------------------------------------
 app.route("/visualize")
     .get((req,res) => {
         const username = req.query.us;
@@ -152,28 +238,27 @@ app.route("/visualize")
 
     });
 
-// Messaging route ---
+// Messaging route --------------------------------------------------------------------------
 app.route("/messages")
     .post((req,res) => {
         let data = req.body;
 
-        // The orchestrator sends updates about finished jobs
+        // The orchestrator sends updates about finished jobs -----
         if (data.message == "update") {
             io.sockets.emit("Modeller", data.update);
 
-        // The orchestrator sends the message to begin visualization
+        // The orchestrator sends the message to begin visualization --------
         } else if (data.message == "visualize") {
-            // Inform the modelling component
-            io.sockets.emit("Modeller", "Data ready for visualization");
 
             // Get the name of the bucket
             const splitter = data.path.split("/")
             const bucket = splitter[0];
+            const prefix = splitter[1]+"/"+splitter[2]+"/";
 
             // Find the files that the bucket contains
-            var objectsStream = minioClient.listObjectsV2(bucket, '', true,'')
+            var objectsStream = minioClient.listObjectsV2(bucket, prefix, true,'')
             objectsStream.on('data', function(obj) {
-                let path = obj.name; //analysis-2/classified-3/wine_quality.csv
+                let path = obj.name; //analysis-2sd8asf98g/classified-3/wine_quality.csv
                 let filename = path.substring(path.lastIndexOf('/') + 1);
                 // Download the file locally
                 minioClient.fGetObject(bucket, path, 'public/data/'+filename, function(err) {
@@ -186,10 +271,16 @@ app.route("/messages")
                     data.file = filename;
                     data.org = bucket;
 
-                    // Inform the visualization component
+                    // Inform the Modelling component
+                    io.sockets.emit("Modeller", "Data ready for visualization, visit the Dashboard");
+                    // Inform the Dashboard component
+                    io.sockets.emit("Dashboard", "Data ready for visualization");
                     io.sockets.emit("Visualizer", data);
-                })
-            })
+
+                    // Inform the visualization component
+                    // io.sockets.emit("Visualizer", data);
+                });
+            });
         }
         res.sendStatus(200);
     });

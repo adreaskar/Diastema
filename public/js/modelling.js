@@ -144,16 +144,17 @@ $(document).ready(function() {
 		data = {
 			"diastema-token":"diastema-key",
 			"analysis-id":getParams("id"),
-			"database-id":getParams("org"),
-			"analysis-datetime": d.getFullYear() + "-" + 
-				/*Add 0 in front of values but always keep last 2 digits*/
-				('0'+(d.getMonth()+1)).slice(-2) + "-" + 
-				('0'+d.getDate()).slice(-2) + " " + 
-				('0'+d.getHours()).slice(-2) + ":" + 
-				('0'+d.getMinutes()).slice(-2) + ":" + 
-				('0'+d.getSeconds()).slice(-2) + ":" + 
-				d.getMilliseconds(),
+			"database-id":getParams("org").toLowerCase(),
 			"jobs":[],
+			"metadata":{
+				"analysis-label": getParams("label"), 
+				"usecase":getParams("usecase"),
+				"source":getParams("source"),
+				"dataset":getParams("dataset"),
+				"user":getParams("us"),
+				"analysis-date": ('0'+d.getDate()).slice(-2) + "-" + ('0'+(d.getMonth()+1)).slice(-2) + "-" + d.getFullYear(), 
+				"analysis-time": ('0'+d.getHours()).slice(-2) + ":" + ('0'+d.getMinutes()).slice(-2) + ":" + ('0'+d.getSeconds()).slice(-2) + ":" + d.getMilliseconds()
+			},
 			"nodes":[],
 			"connections":[]
 		};
@@ -302,7 +303,7 @@ $(document).ready(function() {
 				data: data,
 				success: function() {},
 				error: function(jqXHR, textStatus, err){ alert('text status: '+textStatus+', error: '+err) },
-				url: 'http://localhost:3000/toolkit',
+				url: 'http://localhost:3000/orchestrator',
 				cache:false
 			});
 		} else {
@@ -318,6 +319,18 @@ $(document).ready(function() {
 		} else {
 			toastr.error("Please fill all the fields requied.", "Notification:");
 		}
+	});
+
+	// Go to dashboard button
+	$('#dashb').click(()=> {
+		let url = window.location.origin;
+		const urlParams = new URLSearchParams(window.location.search);
+
+		const user = urlParams.get('us');
+		const org = urlParams.get('org');
+		const id = urlParams.get('id');
+		let dash = url + "/dashboard?us=" + user + "&org=" + org + "&id=" + id;
+		window.location.replace(dash);
 	});
 });
 
