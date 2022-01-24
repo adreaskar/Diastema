@@ -85,16 +85,16 @@
                 </div>
 
                 <!-- User Icon -->
-                <div class="d-flex flex-column flex-grow-0 dropdown h-100 mr-2">
-                    <a style = "box-shadow: none;" class="btn btn-clean txt-dark dropdown-toggle d-flex align-items-center h-100" href="#" role="button"
-                        id="profileDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="img/user.png" width="30" height="30" class="rounded-circle" style="">
+                <div class="d-flex flex-column flex-grow-0 dropdown h-100 mr-2" style="margin-right: 10px;">
+                    <div style = "box-shadow: none;" class="btn btn-clean txt-dark dropdown-toggle d-flex align-items-center h-100"
+                        id="profileDropdownMenu" data-toggle="dropdown" data-mdb-toggle="dropdown" aria-expanded="false">
+                        <img src="img/user.png" width="30" height="30" class="rounded-circle">
                         <span class="pl-2 pr-2" style="text-transform: lowercase;font-size: 15px;padding: 0 7px 0 7px;"><%= user %></span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdownMenu">
-                        <a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i>Profile</a>
-                        <a class="dropdown-item" href="/"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
                     </div>
+                    <ul class="dropdown-menu" aria-labelledby="profileDropdownMenu">
+                        <li><a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="zmdi zmdi-close-circle pr-2"></i> Logout</a></li>
+                    </ul>
                 </div>
 
             </nav>
@@ -138,21 +138,11 @@
 
                         <!-- Process Modeller -->
                         <div class="d-flex flex-column flex-shrink-0 position-relative">
-                            <a href="/modelling?us=<%= user %>&org=<%= org %>&id=<%= id %>" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
+                            <a href="/modelling" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
                                 <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
                                     <span class="material-icons" style="font-size: 30px;color: #3a91b3"> architecture </span>
                                 </span>
                                 <span class="flex-grow-1 expanded-only" style="font-size: large;">Process Modeller</span>
-                            </a>
-                        </div>
-
-                        <!-- Visualization Dashboard -->
-                        <div class="d-flex flex-column flex-shrink-0 position-relative">
-                            <a href="/visualize?us=<%= user %>&org=<%= org %>&id=<%= id %>" id="diagrambtn" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
-                                <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                    <span class="material-icons" style="color: #3a91b3;width: 24px;"> bar_chart </span>
-                                </span>
-                                <span class="flex-grow-1 expanded-only" style="font-size: large;">Visualization Dashboard</span>
                             </a>
                         </div>
 
@@ -200,13 +190,13 @@
     
                         <div class="row" id="results" style="width: 100%;;">
 
-                            <% if(query === "no") { %>
+                            <% if(!query) { %>
                                 <img src='../img/empty.jpg' style='width: 25%;margin:30px auto auto auto'>
                                 <h3 style="text-align: center;margin-top: 20px;">Not any procedures available</h3>
                                 <p style="text-align: center;">Use the Process Modelling tool to start one.</p>
                             <% } else { %>
                                 <% data.forEach(analysis => {%>
-                                    <form action="">
+                                    <form action="/visualize" method="POST">
 
                                         <div class="col-12 col-md-6 mb-4 mb-lg-0 col-lg-8" style="margin: 25px auto auto auto;">
                                             <div class="card">
@@ -214,19 +204,52 @@
                                                 <!-- Card Header Information -->
                                                 <div class="card-header">
                                                     <b><span style="font-size: 20px;"><%=analysis.label%> </span></b>
-                                                    <span style="position: absolute;right: 15px;opacity: .4;">[<%=analysis.id%>]</span><br>
+                                                    <span style="position: absolute;right: 40px;opacity: .4;">[<%=analysis.id%>]</span>
+                                                    <img src="../img/ready.png" style="width: 15px;position: absolute;right: 10px;top: 17px;"><br>
                                                     <span style="font-size: 17px;">Dataset used: <b><%=analysis.dataset%></b></span>
                                                 </div>
                                                 
                                                 <!-- Card Body Information -->
-                                                <div class="card-body" id="viscontainer">
-                                                    <span style="font-size: 17px;">Data source: <b><%=analysis.source%></b></span><br>
-                                                    <span style="font-size: 17px;">Created by: <b><%=analysis.user%></b></span><br>
-                                                    <span style="font-size: 17px;">Usecase: <b><%=analysis.usecase%></b></span>
-                                                    <hr style="opacity: .1;">
-                                                    <span style="font-size: 17px;">Date of creation: <b><%=analysis.date%></b></span><br>
-                                                    <span style="font-size: 17px;">Time of creation: <b><%=analysis.time%></b></span>
-                                                    <hr style="opacity: .1;">
+                                                <div class="card-body">
+
+                                                    <div class="container" style="width: 115%;margin-left: -20px;">
+                                                        <div class="row">
+                                                            <div class="col-md">
+                                                                <b><span style="font-size: 17px;">Data source:</span></b>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <b><span style="font-size: 17px;">Created by:</span></b>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <b><span style="font-size: 17px;">Usecase:</span></b>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <b><span style="font-size: 17px;">Date:</span></b>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <b><span style="font-size: 17px;">Time:</span></b>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md">
+                                                                <span style="font-size: 15px;opacity: .7;"><%=analysis.source%></span>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <span style="font-size: 15px;opacity: .7;"><%=analysis.user%></span>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <span style="font-size: 15px;opacity: .7;"><%=analysis.usecase%></span>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <span style="font-size: 15px;opacity: .7;"><%=analysis.date%></span>
+                                                            </div>
+                                                            <div class="col-md">
+                                                                <span style="font-size: 15px;opacity: .7;"><%=analysis.time%></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <hr style="opacity: .1">
                                                     <span style="font-size: 17px;">Jobs: </span>
                                                     <% analysis.jobs.forEach(job => { %>
                                                         <% if (job === "data-load") { %>
@@ -240,12 +263,14 @@
                                                         <% } %>
                                                     <% }); %>
                                                     <span class="dashvis">Visualization</span>
-                                                    <img src="../img/ready.png" style="width: 15px;position: absolute;bottom: 10px;right: 10px;">
+                                                    <button type="submit" class="btn btn-primary" style="font-size:15px;position: absolute;right: 15px;" id="submit">View Results</button>
                                                 </div>
     
                                             </div>
                                         </div>
 
+                                        <input type="hidden" name="id" value="<%=analysis.id%>">
+                                        
                                     </form>
                                 <% }); %>
                             <% } %>

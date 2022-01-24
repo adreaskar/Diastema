@@ -58,7 +58,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdownMenu">
                         <a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i>Profile</a>
-                        <a class="dropdown-item" href="/"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
+                        <a class="dropdown-item" href="/logout"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
                     </div>
                 </div>
 
@@ -165,7 +165,7 @@
 
                         <!-- Visualization Dashboard -->
                         <!-- <div class="d-flex flex-column flex-shrink-0 position-relative">
-                            <a href="/visualize?us=<%= user %>&org=<%= org %>&id=<%= id %>" id="diagrambtn" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
+                            <a href="/visualize?us=&org=&id=" id="diagrambtn" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
                                 <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
                                     <span class="material-icons" style="color: #3a91b3;width: 24px;"> bar_chart </span>
                                 </span>
@@ -225,6 +225,15 @@
                             </div>
                         </div>
                     </div>
+
+                    <input type="hidden" id="user" value="<%=user%>">
+                    <input type="hidden" id="org" value="<%=org%>">
+                    <input type="hidden" id="analysisid" value="<%=id%>">
+                    <input type="hidden" id="usecase" value="<%=usecase%>">
+                    <input type="hidden" id="source" value="<%=source%>">
+                    <input type="hidden" id="label" value="<%=label%>">
+                    <input type="hidden" id="dataset" value="<%=dataset%>">
+
                 </div>
 
                 <!-- Canvas -->

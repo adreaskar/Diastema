@@ -98,7 +98,7 @@
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdownMenu">
                         <a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i>Profile</a>
-                        <a class="dropdown-item" href="/"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
+                        <a class="dropdown-item" href="/logout"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
                     </div>
                 </div>
 
@@ -138,57 +138,12 @@
                             </a>
                             
                             <ul class="collapse show list-unstyled sidebar-sub-items m-0" id="toolsmenu">
-                                <!-- Data Load -->
-                                <!-- <li>
-                                    <div id="tool" class="draggable_operator d-flex flex-row flex-grow-1 align-items-center txt-dark sidebar-item" style="width: 100%;">
-                                        <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                            <span class="material-icons" style="color: #a53434;"> description </span>
-                                        </span>
-                                        <span class="flex-grow-1 expanded-only">Data Load</span>
-                                    </div>
-                                </li> -->
-                                <!-- Cleaning -->
-                                <!-- <li>
-                                    <div id="tool" class="draggable_operator d-flex flex-row flex-grow-1 align-items-center txt-dark sidebar-item" style="width: 100%;">
-                                        <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                            <i class="fas fa-broom" style="color: #eeb63e;"></i>
-                                        </span>
-                                        <span class="flex-grow-1 expanded-only">Cleaning</span>
-                                    </div>
-                                </li> -->
-                                <!-- Classification -->
-                                <!-- <li>
-                                    <div id="tool" class="draggable_operator d-flex flex-row flex-grow-1 align-items-center txt-dark sidebar-item" style="width: 100%;">
-                                        <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                            <span class="material-icons" style="color: #eeb63e;"> donut_small </span>
-                                        </span>
-                                        <span class="flex-grow-1 expanded-only">Classification</span>
-                                    </div>
-                                </li> -->
-                                <!-- Regression -->
-                                <!-- <li>
-                                    <div id="tool" class="draggable_operator d-flex flex-row flex-grow-1 align-items-center txt-dark sidebar-item" style="width: 100%;">
-                                        <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                            <span class="material-icons" style="color: #eeb63e;"> scatter_plot </span>
-                                        </span>
-                                        <span class="flex-grow-1 expanded-only">Regression</span>
-                                    </div>
-                                </li> -->
-                                <!-- Visualization -->
-                                <!-- <li>
-                                    <div id="tool" class="draggable_operator d-flex flex-row flex-grow-1 align-items-center txt-dark sidebar-item" style="width: 100%;">
-                                        <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
-                                            <span class="material-icons" style="color: #5f8b4d;"> insert_chart </span>
-                                        </span>
-                                        <span class="flex-grow-1 expanded-only">Visualize</span>
-                                    </div>
-                                </li> -->
                             </ul>
                         </div>
 
                         <!-- Process Modeller -->
                         <div class="d-flex flex-column flex-shrink-0 position-relative">
-                            <a href="/modelling?us=<%= user %>&org=<%= org %>&id=<%= id %>" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
+                            <a href="/modelling" aria-expanded="false" class="d-flex flex-row flex-grow-1 align-items-center position-relative txt-dark sidebar-item dropdown-toggle">
                                 <span class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon">
                                     <span class="material-icons" style="font-size: 30px;color: #3a91b3"> architecture </span>
                                 </span>
@@ -202,12 +157,12 @@
 
                     <!-- Sidebar bottom section -->
                     <div class="d-flex flex-shrink-0 collapsible-section py-2">
-                        <a id="dashb" href="#" class="d-flex flex-row flex-grow-1 align-items-center overflow-hidden position-relative txt-dark sidebar-item">
+                        <div id="dashb" href="#" style="cursor: pointer;" class="d-flex flex-row flex-grow-1 align-items-center overflow-hidden position-relative txt-dark sidebar-item">
                             <span>
                                 <span class="material-icons" style="font-size: 34px;margin: 7.5px 9px 0 10px;"> menu_open </span>
                             </span>
                             <span class="expanded-only">Dashboard</span>
-                        </a>
+                        </div>
                         <div id="sidebarCollapse" class="d-flex flex-row flex-shrink-0 align-items-center justify-content-center sidebar-icon py-2" onclick="minimize()">
                             <i class="zmdi zmdi-chevron-left zmdi-hc-2x"></i>
                         </div>
@@ -228,7 +183,6 @@
                         <div style="position:absolute;display: flex;right: 30px;top: -5px;">
                             <div class="inline">
                                 <button type="button" class="set_data btn btn-primary" onclick="downloadPDF()">Export data</button>
-                                <button type="button" class="set_data btn btn-primary" onclick="show()">Show</button>
                             </div>
                         </div>
                     </div>
@@ -261,7 +215,7 @@
                             <!-- Statistics -->
                             <div class="col-12 col-md-6 mb-4 mb-lg-0 col-lg-3">
                                 <div class="card">
-                                    <h5 class="card-header">Metrics</h5>
+                                    <h5 class="card-header">Metadata</h5>
                                     <div class="card-body">
                                         <p class="card-title" id="metadata"></p>
                                     </div>
@@ -293,6 +247,12 @@
                             </div>
                             
                         </div>
+
+                        <input type="hidden" id="newpath" value="<%= info.newpath %>">
+                        <input type="hidden" id="column" value="<%= info.column %>">
+                        <input type="hidden" id="file" value="<%= info.file %>">
+                        <input type="hidden" id="organization" value="<%= info.org %>">
+
                     </main>
                 </div>
 

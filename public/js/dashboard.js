@@ -1,8 +1,5 @@
 $(document).ready(function() {
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-
     const socket = io.connect();
 
     toastr.options = {
@@ -23,7 +20,20 @@ $(document).ready(function() {
     }
 
     socket.on('Dashboard', (message) => {
-        toastr.info(message, "Notification: ");
+        toastr.info(message.notif, "Notification: ");
+
+        // $('form').each(function() {
+        //     let obj = $(this.childNodes[1].childNodes[1].childNodes[3].childNodes[3]);
+        //     let objid = obj.html().replace(/[\[\]']+/g,'');
+
+        //     if (objid === message.file) {
+        //         console.log("Success");
+        //     }
+
+        //     let div = $(this.childNodes[1].childNodes[1].childNodes[7]);
+        //     div.append(`<button type="submit" class="btn btn-primary" style="font-size:15px;position: absolute;right: 15px;" id="submit">View Results</button>`);
+        // });
+
         window.location.reload();
     });
 

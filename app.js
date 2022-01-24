@@ -7,24 +7,22 @@ const socket = require('socket.io');
 const fs = require('fs');
 const Minio = require('minio')
 const upload = require('express-fileupload');
+const MongoStore = require('connect-mongo');
+const session = require('express-session');
 const { path } = require("express/lib/application");
 
 // Database connections ------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
+
+// Mongodb setup-----------------------------
 const baseUrl = "mongodb://localhost:27017/";
 //const baseUrl = "mongodb://10.20.20.98/";
-mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
-const userSchema = new mongoose.Schema ({
-    username: String,
-    email: String,
-    password: String,
-    property: String,
-    organization: String
-});
-
+const userSchema = require('./models/User');
 const User = mongoose.main.model("User", userSchema);
 
-
+// minIO setup----------------------
 var minioClient = new Minio.Client({
     endPoint: '127.0.0.1',
     port: 9000,
@@ -32,16 +30,26 @@ var minioClient = new Minio.Client({
     accessKey: 'diastema',
     secretKey: 'diastema'
 });
+
+// -----------------------------------------------------------------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------
 
 const app = express();
-app.set('view engine', 'ejs')
-
+app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
-app.use(upload())
+app.use(upload());
+app.use(session({
+    secret:'diastema',
+    resave:false,
+    saveUninitialized:false,
+    store:MongoStore.create({
+        mongoUrl: baseUrl+"diastemaDB",
+        collection:'sessions'
+    })
+}));
 
-// Home route ---------------------
+// Home route -----------------------------------------------------------------------------------------------------------
 app.route("/")
     .get((req,res) => {
         res.render("index");
@@ -57,13 +65,26 @@ app.route("/")
                     console.log('no user found');
                     res.redirect("/");
                 } else {
-                    res.redirect("/upload?us=" + req.body.username + "&org=" + data[0].toObject().organization);
+
+                    req.session.user = req.body.username;
+                    req.session.org = (data[0].toObject().organization).toLowerCase();
+
+                    res.redirect("/upload");
                 }
             }
         });
     });
 
-// Register route -------------
+// Logout route -------------------------------------------------------------------------------------------------------------
+app.route("/logout")
+    .get((req,res) => {
+        req.session.destroy((err) => {
+            if (err) throw err;
+            res.redirect("/")
+        });
+    });
+
+// Register route -----------------------------------------------------------------------------------------------------------
 app.route("/register")
     .get((req,res) => {
         res.render("register");
@@ -84,19 +105,18 @@ app.route("/register")
         res.redirect("/")
     });
 
-// Data upload route --------------------------------------------
+// Data upload route -----------------------------------------------------------------------------------------------------------
 app.route("/upload")
     .get((req,res) => {
-        const username = req.query.us;
-        const org = req.query.org;
-        res.render("upload", {user: username, organization:org});
+        res.render("upload");
     })
     .post((req,res) => {
-        const org = (req.body.organization).toLowerCase();
-        const usecase = req.body.usecase;
-        const source = req.body.source;
-        const label = req.body.label;
-        const id = Math.random().toString(16).slice(2);
+
+        req.session.usecase = req.body.usecase;
+        req.session.source = req.body.source;
+        req.session.label = req.body.label;
+        req.session.analysisid = Math.random().toString(16).slice(2);
+        req.session.filename = req.files.inpFile.name;
 
         const uploadpath = 'public/data/';
 
@@ -109,14 +129,14 @@ app.route("/upload")
         });
 
         // Check if bucket exists
-        minioClient.bucketExists(org, function(err, exists) {
+        minioClient.bucketExists(req.session.org, function(err, exists) {
 
             if (err) {
                 return console.log(err)
             }
             // If exists, put the file in the bucket to the specified path and then delete it from local storage
             if (exists) {
-                minioClient.fPutObject(org, "analysis-"+ id +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
+                minioClient.fPutObject(req.session.org, "analysis-"+ req.session.analysisid +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
                     if(error) {
                         return console.log(error);
                     }
@@ -127,14 +147,14 @@ app.route("/upload")
                 });
             // If it doesnt exist, create bucket and then the rest
             } else {
-                minioClient.makeBucket(org, function(err) {
+                minioClient.makeBucket(req.session.org, function(err) {
                     if (err) return console.log(err);
-                    minioClient.fPutObject(org, "analysis-"+ id +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
+                    minioClient.fPutObject(req.session.org, "analysis-"+ req.session.analysisid +"/raw/"+req.files.inpFile.name, uploadpath+req.files.inpFile.name, function(error, etag) {
                         if(error) {
                             return console.log(error);
                         }
                         console.log("Organization bucket has been created");
-                        console.log(req.files.inpFile.name + " has been uploaded to minIO bucket");
+                        console.log(req.files.inpFile.name + " has been uploaded to minIO bucket " + req.session.org);
                         // Deletes the local file
                         fs.unlinkSync(uploadpath+req.files.inpFile.name);   
                     });
@@ -142,28 +162,36 @@ app.route("/upload")
             }
         });
 
-        res.redirect("/modelling?us=" + req.body.user + "&org=" + req.body.organization + "&id=" + id + "&usecase=" + usecase + "&source=" + source + "&label=" + label + "&dataset=" + req.files.inpFile.name);
+        res.redirect("/modelling");
     });
 
-// Modelling route -----------------------------------------------------
+// Modelling route -----------------------------------------------------------------------------------------------------------
 app.route("/modelling")
     .get((req,res) => {
-        const username = req.query.us;
-        const organization = req.query.org;
-        const id = req.query.id;
-        res.render("modelling", {user:username,org:organization,id:id});
+        
+        const username = req.session.user;
+        console.log(username);
+        const org = req.session.org;
+        const id = req.session.analysisid;
+        const usecase = req.session.usecase;
+        const source = req.session.source;
+        const label = req.session.label;
+        const dataset = req.session.filename;
+
+        res.render("modelling", {user:username,org:org, id:id,usecase:usecase,source:source,label:label,dataset:dataset});
     });
 
-// Dashboard route -----------------------------------------------------
+// Dashboard route -----------------------------------------------------------------------------------------------------------
 app.route("/dashboard")
     .get((req,res)=> {
-        const username = req.query.us;
-        const organization = req.query.org;
-        const id = req.query.id;
+
+        const username = req.session.user;
+        const organization = req.session.org;
+
         let data = [];
 
         // Search for collections in organization database
-        mongoose.dash = mongoose.createConnection(baseUrl + organization.toLowerCase(), { useUnifiedTopology: true, useNewUrlParser: true });
+        mongoose.dash = mongoose.createConnection(baseUrl + organization, { useUnifiedTopology: true, useNewUrlParser: true });
         mongoose.dash.on('open', function (ref) {
             
             //Get all collection names
@@ -171,7 +199,6 @@ app.route("/dashboard")
 
                 // Database has collections
                 if (collections.length != 0) {
-                    let query = "yes";
 
                     // For each collection, gather the information needed
                     collections.forEach(async (collection,i) => {
@@ -191,7 +218,7 @@ app.route("/dashboard")
                             if(record["job-json"]) {
                                 info["jobs"].push(record["job-json"]["title"]);
                             }
-                            if (record["kind"]) {
+                            if (record["kind"] === "metadata") {
                                 info.label = record.metadata["analysis-label"];
                                 info.usecase = record.metadata.usecase;
                                 info.source = record.metadata.source;
@@ -199,6 +226,7 @@ app.route("/dashboard")
                                 info.user = record.metadata.user;
                                 info.date = record.metadata["analysis-date"];
                                 info.time = record.metadata["analysis-time"];
+                                info.org = organization;
                             }
                         });
 
@@ -206,39 +234,45 @@ app.route("/dashboard")
 
                         // If it is the last collection, render the page
                         if (i === collections.length - 1 ) {
-                            res.render("dashboard", {user:username,org:organization,id:id,query:query,data:data});
+                            res.render("dashboard", {user:username,query:true,data:data});
                         }
                     });
                 // Database is empty
                 } else {
-                    let query = "no";
-                    res.render("dashboard", {user:username,org:organization,id:id,query:query});
+                    res.render("dashboard", {user:username,id:id,query:false});
                 }
 
             });
         });
     });
 
-// Toolkit route ------------------
+// Toolkit route -----------------------------------------------------------------------------------------------------------
 app.route("/toolkit")
     .post((req,res) => {
         console.log(req.body);
         res.redirect("/modelling");
     });
 
-// Visualization route -----------------------------------------------------
+// Visualization route -----------------------------------------------------------------------------------------------------------
 app.route("/visualize")
-    .get((req,res) => {
-        const username = req.query.us;
-        const organization = req.query.org;
-        const id = req.query.id;
-        res.render("visualization", {user:username,org:organization,id:id});
-    })
     .post((req,res) => {
+        // TAKE INFO FROM FORM AND SEARCH MONGO
+        // AFTER THAT RENDER WITH DATA
 
+        mongoose.visualizer = mongoose.createConnection(baseUrl + req.session.org, { useUnifiedTopology: true, useNewUrlParser: true });
+        mongoose.visualizer.once('open', function () {
+
+            mongoose.visualizer.db.collection(req.body.id, function(err, collection){
+                collection.find({kind:"visualize"}).toArray(function(err, data){
+                    let info = data[0];
+                    res.render("visualization", {user:req.session.user,info:info});
+                })
+            });
+        
+        });
     });
 
-// Messaging route --------------------------------------------------------------------------
+// Messaging route -----------------------------------------------------------------------------------------------------------
 app.route("/messages")
     .post((req,res) => {
         let data = req.body;
@@ -260,6 +294,7 @@ app.route("/messages")
             objectsStream.on('data', function(obj) {
                 let path = obj.name; //analysis-2sd8asf98g/classified-3/wine_quality.csv
                 let filename = path.substring(path.lastIndexOf('/') + 1);
+                
                 // Download the file locally
                 minioClient.fGetObject(bucket, path, 'public/data/'+filename, function(err) {
                     if (err) {
@@ -274,11 +309,24 @@ app.route("/messages")
                     // Inform the Modelling component
                     io.sockets.emit("Modeller", "Data ready for visualization, visit the Dashboard");
                     // Inform the Dashboard component
-                    io.sockets.emit("Dashboard", "Data ready for visualization");
-                    io.sockets.emit("Visualizer", data);
+                    io.sockets.emit("Dashboard", {notif:"Data ready for visualization",file:splitter[1]});
 
-                    // Inform the visualization component
-                    // io.sockets.emit("Visualizer", data);
+                    // ADD INFO TO MONGO//
+                    mongoose.orchinfo = mongoose.createConnection(baseUrl + data.org, { useUnifiedTopology: true, useNewUrlParser: true });
+                    const orchSchema = require('./models/Orch');
+
+                    const Orch = mongoose.orchinfo.model("Orch", orchSchema, splitter[1]);
+
+                    const orch = new Orch ({
+                        kind: "visualize",
+                        newpath: data.newpath,
+                        file: data.file,
+                        org: data.org,
+                        job: data.job,
+                        column: data.column
+                    });
+            
+                    orch.save();
                 });
             });
         }

@@ -347,7 +347,6 @@ h3, .material-icons {
 }
 
 #dashbmain .col-12 {
-  cursor:pointer;
   transition: transform 0.3s ease;
 }
 
