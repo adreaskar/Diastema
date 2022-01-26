@@ -15,8 +15,8 @@ const { path } = require("express/lib/application");
 // ---------------------------------------------------------------------------------------------------------
 
 // Mongodb setup-----------------------------
-const baseUrl = "mongodb://localhost:27017/";
-//const baseUrl = "mongodb://10.20.20.98/";
+//const baseUrl = "mongodb://localhost:27017/";
+const baseUrl = "mongodb://10.20.20.98/";
 mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const userSchema = require('./models/User');
@@ -24,7 +24,7 @@ const User = mongoose.main.model("User", userSchema);
 
 // minIO setup----------------------
 var minioClient = new Minio.Client({
-    endPoint: '127.0.0.1',
+    endPoint: '10.20.20.191',
     port: 9000,
     useSSL: false,
     accessKey: 'diastema',
@@ -170,7 +170,6 @@ app.route("/modelling")
     .get((req,res) => {
         
         const username = req.session.user;
-        console.log(username);
         const org = req.session.org;
         const id = req.session.analysisid;
         const usecase = req.session.usecase;

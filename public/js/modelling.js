@@ -302,7 +302,7 @@ $(document).ready(function() {
 			// 	cache:false
 			// });
 
-			const socket2 = io("http://orchestrator");
+			const socket2 = io("localhost://10.20.20.85:5000");
 			socket2.emit("analysis", {'analysis':data});
 			socket2.disconnect();
 
