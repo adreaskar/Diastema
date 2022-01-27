@@ -294,7 +294,7 @@ $(document).ready(function() {
 		if (validateFields()) {
 			generateData();
 
-			fetch("https://10.20.20.85:4999/analysis", {
+			fetch("https://83.212.238.166:50002/analysis", {
 				method: "POST",
 				headers: {'Content-Type': 'application/json'}, 
 				body: JSON.stringify(data)
