@@ -4,5 +4,5 @@ COPY package*.json /app/
 RUN npm install -g nodemon
 RUN npm install 
 COPY . /app/
-CMD ["nodemon"]
+CMD ["npm start"]
 EXPOSE 3000
