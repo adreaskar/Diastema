@@ -293,18 +293,18 @@ $(document).ready(function() {
 	$('#send_data').click(()=>{
 		if (validateFields()) {
 			generateData();
-			// $.ajax({
-			// 	type: 'POST',
-			// 	data: data,
-			// 	success: function() {},
-			// 	error: function(jqXHR, textStatus, err){ alert('text status: '+textStatus+', error: '+err) },
-			// 	url: 'http://localhost:3000/orchestrator',
-			// 	cache:false
-			// });
 
-			const socket2 = io("localhost://10.20.20.85:5000");
-			socket2.emit("analysis", {'analysis':data});
-			socket2.disconnect();
+			fetch("http://10.20.20.85:4999/analyiss", {
+				method: "POST",
+				headers: {'Content-Type': 'application/json'}, 
+				body: JSON.stringify(data)
+			}).then(res => {
+				console.log("Data sent to orchestrator!", res);
+			});
+
+			// const socket2 = io("http://10.20.20.85:5000");
+			// socket2.emit("analysis", {'analysis':data});
+			// socket2.disconnect();
 
 		} else {
 			toastr.error("Please fill all the fields requied.", "Notification:");

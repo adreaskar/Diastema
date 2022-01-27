@@ -14,7 +14,7 @@ const { path } = require("express/lib/application");
 // Database connections ------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
 
-// Mongodb setup-----------------------------
+// Mongodb setup
 //const baseUrl = "mongodb://localhost:27017/";
 const baseUrl = "mongodb://10.20.20.98/";
 mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
@@ -22,9 +22,11 @@ mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTo
 const userSchema = require('./models/User');
 const User = mongoose.main.model("User", userSchema);
 
-// minIO setup----------------------
+// minIO setup
+//const endpoint = '127.0.0.1';
+const endpoint = '10.20.20.191';
 var minioClient = new Minio.Client({
-    endPoint: '10.20.20.191',
+    endPoint: endpoint,
     port: 9000,
     useSSL: false,
     accessKey: 'diastema',
@@ -261,8 +263,9 @@ app.route("/visualize")
         mongoose.visualizer = mongoose.createConnection(baseUrl + req.session.org, { useUnifiedTopology: true, useNewUrlParser: true });
         mongoose.visualizer.once('open', function () {
 
-            mongoose.visualizer.db.collection(req.body.id, function(err, collection){
-                collection.find({kind:"visualize"}).toArray(function(err, data){
+            let coll = (req.body.id).replace("-", "_");
+            mongoose.visualizer.db.collection(coll, function(err, collection){
+                collection.find({kind:"visualize"}).toArray(function(err, data) {
                     let info = data[0];
                     res.render("visualization", {user:req.session.user,info:info});
                 })
@@ -314,7 +317,8 @@ app.route("/messages")
                     mongoose.orchinfo = mongoose.createConnection(baseUrl + data.org, { useUnifiedTopology: true, useNewUrlParser: true });
                     const orchSchema = require('./models/Orch');
 
-                    const Orch = mongoose.orchinfo.model("Orch", orchSchema, splitter[1]);
+                    let coll = splitter[1].replace("-", "_");
+                    const Orch = mongoose.orchinfo.model("Orch", orchSchema, coll);
 
                     const orch = new Orch ({
                         kind: "visualize",
