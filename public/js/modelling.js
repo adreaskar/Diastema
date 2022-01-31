@@ -135,6 +135,7 @@ $(document).ready(function() {
 
 		// Main json file template ---------------------------------------
 		data = {
+			"analysis-datetime" :"2021-10-06 02:55:45:796", //weird bug testing
 			"diastema-token":"diastema-key",
 			"analysis-id": $("#analysisid").val(),
 			"database-id": $("#org").val(),
