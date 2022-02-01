@@ -240,7 +240,7 @@ app.route("/dashboard")
                     });
                 // Database is empty
                 } else {
-                    res.render("dashboard", {user:username,id:id,query:false});
+                    res.render("dashboard", {user:username,query:false});
                 }
 
             });
@@ -257,7 +257,8 @@ app.route("/toolkit")
 // Visualization route -----------------------------------------------------------------------------------------------------------
 app.route("/visualize")
     .post((req,res) => {
-        // TAKE INFO FROM FORM AND SEARCH MONGO
+
+        // TAKE INFO FROM DASHBOARD FORM AND SEARCH MONGO
         // AFTER THAT RENDER WITH DATA
 
         mongoose.visualizer = mongoose.createConnection(baseUrl + req.session.org, { useUnifiedTopology: true, useNewUrlParser: true });
@@ -267,7 +268,17 @@ app.route("/visualize")
             mongoose.visualizer.db.collection(coll, function(err, collection){
                 collection.find({kind:"visualize"}).toArray(function(err, data) {
                     let info = data[0];
-                    res.render("visualization", {user:req.session.user,info:info});
+
+                    // Add the correct dataset name that the user uploaded
+                    collection.find({kind:"metadata"}).toArray(function(err, data) {
+                        
+                        info.file = data[0]["metadata"]["dataset"];
+                        info.metadata = data[0]["metadata"];
+
+                        console.log(info);
+                        res.render("visualization", {user:req.session.user,info:info});
+                    });
+
                 })
             });
         

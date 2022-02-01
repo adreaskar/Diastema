@@ -21,8 +21,8 @@ $(document).ready(function() {
     const file = $("#newpath").val();//data.newpath;
     const column = $("#column").val();//data.column;
 
-    $('#dataset').text($("#file").val());//data.file
-    $('#org').text($("#organization").val().charAt(0).toUpperCase() + $("#organization").val().slice(1));
+    // $('#dataset').text($("#file").val());
+    // $('#org').text($("#organization").val().charAt(0).toUpperCase() + $("#organization").val().slice(1));
 
     // Load the file from its destination --
     d3.csv(file).then((loadedData) => {
