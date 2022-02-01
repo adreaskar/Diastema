@@ -275,7 +275,6 @@ app.route("/visualize")
                         info.file = data[0]["metadata"]["dataset"];
                         info.metadata = data[0]["metadata"];
 
-                        console.log(info);
                         res.render("visualization", {user:req.session.user,info:info});
                     });
 

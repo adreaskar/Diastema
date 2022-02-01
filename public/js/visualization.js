@@ -18,11 +18,8 @@ $(document).ready(function() {
     };
     toastr.info("Visualizing data", "Notification: ");
 
-    const file = $("#newpath").val();//data.newpath;
-    const column = $("#column").val();//data.column;
-
-    // $('#dataset').text($("#file").val());
-    // $('#org').text($("#organization").val().charAt(0).toUpperCase() + $("#organization").val().slice(1));
+    const file = $("#newpath").val();
+    const column = $("#column").val();
 
     // Load the file from its destination --
     d3.csv(file).then((loadedData) => {
@@ -67,7 +64,7 @@ $(document).ready(function() {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Wine Quality',
+                    label: column.charAt(0).toUpperCase() + column.slice(1),
                     data:data,
                     backgroundColor: [
                         "rgba(255,159,64,0.7)",
