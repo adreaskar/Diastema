@@ -203,7 +203,7 @@ $(document).ready(function() {
 			if (data.nodes[m].type === "Classification" || data.nodes[m].type === "Regression") {
 				job.algorithm = data.nodes[m].property.toLowerCase();
 				if (job.algorithm === "select algorithm") job.algorithm = false;
-				job.column = data.nodes[m].field;
+				job.column = data.nodes[m].field.toLowerCase(); // Possible bug fix 
 			}
 
 			// Properties specific to the Cleaning job
