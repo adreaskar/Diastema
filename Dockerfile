@@ -5,5 +5,6 @@ RUN npm install -g nodemon
 RUN npm install mongodb
 RUN npm install 
 COPY . /app/
+RUN mkdir -p /app/public/data
 CMD ["nodemon"]
 EXPOSE 3000
