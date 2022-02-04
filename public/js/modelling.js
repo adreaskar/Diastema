@@ -37,7 +37,7 @@ socket.on('Modeller', (update) => {
 	if (first) {
 		// Add to notifications list
 		$('#notif_list').append(" \
-		<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;width:350px'> \
+		<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;'> \
 			<p class='small text-uppercase mb-2'>"+ ('0'+date.getHours()).slice(-2) + ":" + ('0'+date.getMinutes()).slice(-2) + ":" + ('0'+date.getSeconds()).slice(-2) +"</p> \
 			<p style='color:#5f5f5f' class='mb-0'>Update: " + update + "</p> \
 		</a> \
@@ -46,7 +46,7 @@ socket.on('Modeller', (update) => {
 	} else {
 		// Add to notifications list
 		$('#notif_list').append(" \
-			<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;width:350px;border-top:2px solid #3a91b33f'> \
+			<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;border-top:2px solid #3a91b33f'> \
 				<p class='small text-uppercase mb-2'>"+ ('0'+date.getHours()).slice(-2) + ":" + ('0'+date.getMinutes()).slice(-2) + ":" + ('0'+date.getSeconds()).slice(-2) +"</p> \
 				<p style='color:#5f5f5f' class='mb-0'>Update: " + update + "</p> \
 			</a> \
@@ -337,10 +337,6 @@ $(document).ready(function() {
 			}).then(res => {
 				console.log("Data sent to orchestrator!", res);
 			});
-
-			// const socket2 = io("http://10.20.20.85:5000");
-			// socket2.emit("analysis", {'analysis':data});
-			// socket2.disconnect();
 
 		} else {
 			toastr.error("Please fill all the fields requied.", "Notification:");
