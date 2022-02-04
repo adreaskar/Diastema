@@ -182,14 +182,14 @@ $(document).ready(function() {
 				"analysis-date": ('0'+d.getDate()).slice(-2) + "-" + ('0'+(d.getMonth()+1)).slice(-2) + "-" + d.getFullYear(), 
 				"analysis-time": ('0'+d.getHours()).slice(-2) + ":" + ('0'+d.getMinutes()).slice(-2) + ":" + ('0'+d.getSeconds()).slice(-2) + ":" + d.getMilliseconds()
 			},
-			"nodes":[],
+			//"nodes":[],
 			"connections":[]
 		};
 
-		// Get nodes -------------------
-		for (l in diagram) {
-			data.nodes.push(diagram[l]);
-		}
+		// Get nodes ------------------- NODES WILL RETURN FOR DEMO 2
+		// for (l in diagram) {
+		// 	data.nodes.push(diagram[l]);
+		// }
 		// Get connections ----------------------
 		for (k in linesArray) {
 			data.connections.push(linesArray[k]);
