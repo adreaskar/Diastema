@@ -44,23 +44,36 @@
 
                 <!-- Logo -->
                 <div id="brand" class="d-flex flex-column flex-grow-1 brand-content px-2">
-                <a id="navbar-brand" class="navbar-brand d-flex align-items-center p-0 m-0" href="/" style="width:150px">
-                    <img src="img/logo.png" class="navbar-image py-2" alt="" loading="lazy">
-                </a>
+                    <a id="navbar-brand" class="navbar-brand d-flex align-items-center p-0 m-0" href="/" style="width:150px">
+                        <img src="img/logo.png" class="navbar-image py-2" alt="" loading="lazy">
+                    </a>
                 </div>
 
-                <!-- User Icon -->
+                <!-- Notification Bell -->
                 <div class="d-flex flex-column flex-grow-0 dropdown h-100 mr-2">
-                    <a style = "box-shadow: none;" class="btn btn-clean txt-dark dropdown-toggle d-flex align-items-center h-100" href="#" role="button"
-                        id="profileDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="img/user.png" width="30" height="30" class="rounded-circle">
+                    <a style = "box-shadow: none;padding: 8px;" class="btn dropdown-toggle hidden-arrow d-flex align-items-center h-100" role="button"
+                        id="navbarNotification" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-mdb-ripple-duration="0s">
+                        <i class="fas fa-bell" alt="Notifications" style="color: #737373;font-size: 20px;"></i>
+                        <span class='badge rounded-pill badge-notification bg-danger' id="alerts"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-end" aria-labelledby="navbarNotification" id="notif_list">                        
+                    </div>
+                </div>
+                
+                <!-- User Icon -->
+                <div class="d-flex flex-column flex-grow-0 dropdown h-100 mr-2" style="margin-right: 20px !important;">
+                    <a style = "box-shadow: none;padding: 8px;" class="btn dropdown-toggle d-flex align-items-center h-100" role="button"
+                        id="profileDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-mdb-ripple-duration="0s">
+                        <!-- <img src="img/user.png" width="30" height="30" class="rounded-circle"> -->
+                        <i class="fas fa-user-circle" alt="Notifications" style="color: #737373;font-size: 22px;"></i>
                         <span class="pl-2 pr-2" style="text-transform: lowercase;font-size: 15px;"><%= user %></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdownMenu">
-                        <a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i>Profile</a>
+                        <!-- <a class="dropdown-item" href="#"><i class="zmdi zmdi-account pr-2"></i>Profile</a> -->
                         <a class="dropdown-item" href="/logout"><i class="zmdi zmdi-close-circle pr-2"></i>Logout</a>
                     </div>
                 </div>
+
 
             </nav>
         </div>

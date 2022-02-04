@@ -25,10 +25,43 @@ toastr.options = {
 	"showMethod": "fadeIn",
 	"hideMethod": "fadeOut"
 }
-	
+
+// Notifications counter
+let i = 0;
+let first = true;
 socket.on('Modeller', (update) => {
+	const date = new Date();
+	i++;
+	$('#alerts').html(i)
+
+	if (first) {
+		// Add to notifications list
+		$('#notif_list').append(" \
+		<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;width:350px'> \
+			<p class='small text-uppercase mb-2'>"+ ('0'+date.getHours()).slice(-2) + ":" + ('0'+date.getMinutes()).slice(-2) + ":" + ('0'+date.getSeconds()).slice(-2) +"</p> \
+			<p style='color:#5f5f5f' class='mb-0'>Update: " + update + "</p> \
+		</a> \
+		");
+		first = false;
+	} else {
+		// Add to notifications list
+		$('#notif_list').append(" \
+			<a gtm-id='Notifications' class='dropdown-item' style='padding: 10px 30px 10px 30px;width:350px;border-top:2px solid #3a91b33f'> \
+				<p class='small text-uppercase mb-2'>"+ ('0'+date.getHours()).slice(-2) + ":" + ('0'+date.getMinutes()).slice(-2) + ":" + ('0'+date.getSeconds()).slice(-2) +"</p> \
+				<p style='color:#5f5f5f' class='mb-0'>Update: " + update + "</p> \
+			</a> \
+		");
+	}
+
+	// Send push notification
 	toastr.info(update, "Notification:");
-})
+});
+
+// Reset bell counter
+$('#navbarNotification').click(function() {
+	$('#alerts').empty();
+	i=0;
+});
 // --------------------------------------------------------- //
 
 

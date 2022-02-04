@@ -9,22 +9,21 @@ const Minio = require('minio')
 const upload = require('express-fileupload');
 const MongoStore = require('connect-mongo');
 const session = require('express-session');
-const { path } = require("express/lib/application");
 
 // Database connections ------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------
 
 // Mongodb setup
-//const baseUrl = "mongodb://localhost:27017/";
-const baseUrl = "mongodb://10.20.20.98/";
+const baseUrl = "mongodb://localhost:27017/";
+//const baseUrl = "mongodb://10.20.20.98/";
 mongoose.main = mongoose.createConnection(baseUrl + "diastemaDB", { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 const userSchema = require('./models/User');
 const User = mongoose.main.model("User", userSchema);
 
 // minIO setup
-//const endpoint = '127.0.0.1';
-const endpoint = '10.20.20.191';
+const endpoint = '127.0.0.1';
+//const endpoint = '10.20.20.191';
 var minioClient = new Minio.Client({
     endPoint: endpoint,
     port: 9000,
